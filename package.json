@@ -1,0 +1,12 @@
+{
+  "name": "score-keeper",
+  "version": "1.0.0",
+  "description": "simple score keeper for games.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
