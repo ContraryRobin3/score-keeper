@@ -23,6 +23,7 @@ main {
   gap: 10px;
 }
 .team-card {
+  position: relative;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -67,6 +68,11 @@ input[type="text"] {
   padding: 13px 16px;
   border-radius: 5px;
   border: none;
+}
+.delete-button {
+  position: absolute;
+  right: 20px;
+  top: 20px;
 }
 /*  #222831 
     #31363F

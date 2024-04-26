@@ -53,6 +53,17 @@ function addTeam(teamName) {
   saveToStorage("teams", currentTeams);
   refreshTeamCards();
 }
+function deleteTeam(index) {
+  if (confirm("Are you sure you want to delete this team?") == true) {
+    console.log("deleting");
+    console.log(index);
+    let currentTeams = getFromStorage("teams");
+    currentTeams.splice(index, 1);
+    console.log(currentTeams);
+    saveToStorage("teams", currentTeams);
+    refreshTeamCards();
+  }
+}
 
 function refreshTeamCards() {
   // Clear out container
@@ -62,10 +73,11 @@ function refreshTeamCards() {
   }
   const teams = getFromStorage("teams");
   console.log(teams);
+  let index = 0;
   teams.forEach((team) => {
     const teamCard = document.createElement("div");
     teamCard.classList.add("team-card");
-    teamCard.style.backgroundColor = team.color;
+    teamCard.style.backgroundColor = teamColors[index];
 
     const teamName = document.createElement("h2");
     teamName.classList.add("team-name");
@@ -86,7 +98,15 @@ function refreshTeamCards() {
     scoreButtons.appendChild(addButton);
     teamCard.appendChild(scoreButtons);
 
+    const deleteButton = createDeleteButton(20);
+    deleteButton.classList.add("delete-button");
+    deleteButton.onclick = (index) => {
+      deleteTeam(index);
+    };
+    teamCard.appendChild(deleteButton);
+
     container.appendChild(teamCard);
+    index++;
   });
   if (getTeamCount() < 4) {
     const addCard = document.createElement("div");
@@ -166,5 +186,17 @@ function createAddButton(size) {
   addButton.setAttributeNS(null, "fill", "currentColor");
   addButton.innerHTML =
     "<path d='M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0'/>";
+  return addButton;
+}
+
+function createDeleteButton(size) {
+  var xmlns = "http://www.w3.org/2000/svg";
+  const addButton = document.createElementNS(xmlns, "svg");
+  addButton.setAttributeNS(null, "viewBox", "0 0 " + 16 + " " + 16);
+  addButton.setAttributeNS(null, "width", size);
+  addButton.setAttributeNS(null, "height", size);
+  addButton.setAttributeNS(null, "fill", "#CCCCCC");
+  addButton.innerHTML =
+    "<path d='M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0'/>";
   return addButton;
 }
