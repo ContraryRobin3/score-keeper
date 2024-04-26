@@ -45,7 +45,7 @@ function addTeam(teamName) {
   const newTeam = {
     id: currentCount,
     name: teamName,
-    score: Math.floor(Math.random() * 80),
+    score: 0,
     color: teamColors[currentCount],
   };
   let currentTeams = getFromStorage("teams");
@@ -55,11 +55,8 @@ function addTeam(teamName) {
 }
 function deleteTeam(index) {
   if (confirm("Are you sure you want to delete this team?") == true) {
-    console.log("deleting");
-    console.log(index);
     let currentTeams = getFromStorage("teams");
     currentTeams.splice(index, 1);
-    console.log(currentTeams);
     saveToStorage("teams", currentTeams);
     refreshTeamCards();
   }
@@ -93,16 +90,16 @@ function refreshTeamCards() {
     scoreButtons.classList.add("score-buttons");
 
     const subtractButton = createSubtractButton(50);
+    subtractButton.onclick = subtractPoint.bind(subtractButton, index);
     scoreButtons.appendChild(subtractButton);
     const addButton = createAddButton(50);
+    addButton.onclick = addPoint.bind(addButton, index);
     scoreButtons.appendChild(addButton);
     teamCard.appendChild(scoreButtons);
 
     const deleteButton = createDeleteButton(20);
     deleteButton.classList.add("delete-button");
-    deleteButton.onclick = (index) => {
-      deleteTeam(index);
-    };
+    deleteButton.onclick = deleteTeam.bind(deleteButton, index);
     teamCard.appendChild(deleteButton);
 
     container.appendChild(teamCard);
@@ -132,6 +129,9 @@ function refreshTeamCards() {
     addCard.appendChild(scoreButtons);
 
     container.appendChild(addCard);
+  }
+  if (myChart) {
+    myChart.destroy();
   }
   myChart = createChart();
 }
@@ -166,6 +166,20 @@ function createChart() {
       },
     },
   });
+}
+
+function addPoint(index) {
+  let teams = getFromStorage("teams");
+  teams[index].score++;
+  saveToStorage("teams", teams);
+  refreshTeamCards();
+}
+
+function subtractPoint(index) {
+  let teams = getFromStorage("teams");
+  teams[index].score--;
+  saveToStorage("teams", teams);
+  refreshTeamCards();
 }
 
 function getScores() {
