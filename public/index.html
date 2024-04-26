@@ -10,7 +10,7 @@
   <body>
     <main>
       <h1>Game Title</h1>
-      <div class="team-container">
+      <div id="team-container">
         <div class="team-card">
           <h2 class="team-name">Team Name</h2>
           <p class="team-score">70</p>
@@ -20,7 +20,6 @@
               width="50"
               height="50"
               fill="currentColor"
-              class="bi bi-dash-square-fill"
               viewBox="0 0 16 16"
             >
               <path
@@ -33,7 +32,6 @@
               width="50"
               height="50"
               fill="currentColor"
-              class="bi bi-plus-square-fill"
               viewBox="0 0 16 16"
             >
               <path
@@ -47,6 +45,7 @@
             type="text"
             name="new-team-name"
             placeholder="Enter new team name"
+            id="new-team-name-input"
           />
           <div class="score-buttons">
             <svg
@@ -54,8 +53,8 @@
               width="82"
               height="82"
               fill="currentColor"
-              class="bi bi-plus-square-fill"
               viewBox="0 0 16 16"
+              id="add-team-button"
             >
               <path
                 d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0"

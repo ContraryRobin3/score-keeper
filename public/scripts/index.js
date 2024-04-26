@@ -29,22 +29,90 @@ if (storageAvailable("localStorage")) {
     let teams = [];
     saveToStorage("teams", teams);
   }
-  console.log(getFromStorage("teams"));
 } else {
   // Too bad, no localStorage for us
 }
+//localStorage.removeItem("teams");
 
 const teamColors = ["#5661D6", "#D65657", "#D7BB57", "#56D679"];
 
+document.querySelector("#add-team-button");
+refreshTeamCards();
+
 function addTeam(teamName) {
-  let newTeam = {
-    id: getTeamCount(),
+  const currentCount = getTeamCount();
+  console.log("currentCount" + currentCount);
+  const newTeam = {
+    id: currentCount,
     name: teamName,
     score: 0,
-    color: teamColors(getTeamCount()),
+    color: teamColors[currentCount],
   };
-  saveToStorage(teams, getFromStorage(teams).push());
-  console.log("add team: " + getFromStorage("teams"));
+  let currentTeams = getFromStorage("teams");
+  currentTeams.push(newTeam);
+  saveToStorage("teams", currentTeams);
+  refreshTeamCards();
+}
+
+function refreshTeamCards() {
+  // Clear out container
+  const container = document.getElementById("team-container");
+  while (container.firstChild) {
+    container.removeChild(container.lastChild);
+  }
+  const teams = getFromStorage("teams");
+  console.log(teams);
+  teams.forEach((team) => {
+    const teamCard = document.createElement("div");
+    teamCard.classList.add("team-card");
+    teamCard.style.backgroundColor = team.color;
+
+    const teamName = document.createElement("h2");
+    teamName.classList.add("team-name");
+    teamName.innerHTML = team.name;
+    teamCard.appendChild(teamName);
+
+    const teamScore = document.createElement("p");
+    teamScore.classList.add("team-score");
+    teamScore.innerHTML = team.score;
+    teamCard.appendChild(teamScore);
+
+    const scoreButtons = document.createElement("div");
+    scoreButtons.classList.add("score-buttons");
+
+    const subtractButton = createSubtractButton(50);
+    scoreButtons.appendChild(subtractButton);
+    const addButton = createAddButton(50);
+    scoreButtons.appendChild(addButton);
+    teamCard.appendChild(scoreButtons);
+
+    container.appendChild(teamCard);
+  });
+  if (getTeamCount() < 4) {
+    const addCard = document.createElement("div");
+    addCard.classList.add("add-card");
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = "new-team-name";
+    input.placeholder = "Enter new team name";
+    input.id = "new-team-name-input";
+    addCard.appendChild(input);
+
+    const scoreButtons = document.createElement("div");
+    scoreButtons.classList.add("score-buttons");
+
+    const addButton = createAddButton(82);
+    addButton.onclick = () => {
+      const newName = document.querySelector("#new-team-name-input").value;
+      addTeam(newName);
+      document.querySelector("#new-team-name-input").value = "";
+    };
+    scoreButtons.appendChild(addButton);
+    addCard.appendChild(scoreButtons);
+
+    container.appendChild(addCard);
+  }
 }
 
 const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
@@ -66,7 +134,7 @@ var myChart = new Chart("myChart", {
 });
 
 function getTeamCount() {
-  getFromStorage("teams").length;
+  return getFromStorage("teams").length;
 }
 
 function saveToStorage(name, jsonObject) {
@@ -75,4 +143,28 @@ function saveToStorage(name, jsonObject) {
 
 function getFromStorage(name) {
   return JSON.parse(localStorage.getItem(name));
+}
+
+function createSubtractButton(size) {
+  var xmlns = "http://www.w3.org/2000/svg";
+  const subtractButton = document.createElementNS(xmlns, "svg");
+  subtractButton.setAttributeNS(null, "viewBox", "0 0 " + 16 + " " + 16);
+  subtractButton.setAttributeNS(null, "width", size);
+  subtractButton.setAttributeNS(null, "height", size);
+  subtractButton.setAttributeNS(null, "fill", "currentColor");
+  subtractButton.innerHTML =
+    "<path d='M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm2.5 7.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1'/>";
+  return subtractButton;
+}
+
+function createAddButton(size) {
+  var xmlns = "http://www.w3.org/2000/svg";
+  const addButton = document.createElementNS(xmlns, "svg");
+  addButton.setAttributeNS(null, "viewBox", "0 0 " + 16 + " " + 16);
+  addButton.setAttributeNS(null, "width", size);
+  addButton.setAttributeNS(null, "height", size);
+  addButton.setAttributeNS(null, "fill", "currentColor");
+  addButton.innerHTML =
+    "<path d='M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0'/>";
+  return addButton;
 }
