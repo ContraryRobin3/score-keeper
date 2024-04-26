@@ -45,7 +45,7 @@ function addTeam(teamName) {
   const newTeam = {
     id: currentCount,
     name: teamName,
-    score: 0,
+    score: Math.floor(Math.random() * 80),
     color: teamColors[currentCount],
   };
   let currentTeams = getFromStorage("teams");
@@ -133,25 +133,57 @@ function refreshTeamCards() {
 
     container.appendChild(addCard);
   }
+  myChart = createChart();
 }
 
 const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
 const yValues = [55, 49, 44, 24, 15];
 const barColors = ["red", "green", "blue", "orange", "brown"];
 
-var myChart = new Chart("myChart", {
-  type: "bar",
-  data: {
-    labels: xValues,
-    datasets: [
-      {
-        backgroundColor: barColors,
-        data: yValues,
+var myChart = createChart();
+
+function createChart() {
+  return new Chart("myChart", {
+    type: "bar",
+    data: {
+      labels: getTeamNames(),
+      datasets: [
+        {
+          backgroundColor: teamColors,
+          data: getScores(),
+        },
+      ],
+    },
+    options: {
+      scales: {
+        yAxes: [
+          {
+            ticks: {
+              beginAtZero: true,
+            },
+          },
+        ],
       },
-    ],
-  },
-  options: {},
-});
+    },
+  });
+}
+
+function getScores() {
+  let scores = [];
+  const teams = getFromStorage("teams");
+  teams.forEach((team) => {
+    scores.push(team.score);
+  });
+  return scores;
+}
+function getTeamNames() {
+  let names = [];
+  const teams = getFromStorage("teams");
+  teams.forEach((team) => {
+    names.push(team.name);
+  });
+  return names;
+}
 
 function getTeamCount() {
   return getFromStorage("teams").length;
