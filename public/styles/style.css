@@ -15,23 +15,23 @@ main {
   text-align: center;
   gap: 10px;
 }
-#team-container {
-  height: 40%;
-  width: 90%;
+
+/****************************************/
+/* Cards */
+/****************************************/
+.card {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-.team-card {
-  position: relative;
   flex-grow: 1;
-  display: flex;
   flex-direction: column;
-  padding: 30px;
-  border-radius: 5px;
   align-items: stretch;
   justify-content: center;
+  border-radius: 5px;
+  padding: 30px;
   gap: 30px;
+}
+/* Team Card */
+.team-card {
+  position: relative;
 }
 .team-name {
   font-size: 30px;
@@ -46,17 +46,18 @@ main {
   gap: 55px;
   justify-content: center;
 }
-.add-card {
-  flex-grow: 1;
-  border-radius: 5px;
-  background-color: #222831;
-  display: flex;
-  padding: 30px;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  gap: 30px;
+.delete-button {
+  position: absolute;
+  right: 20px;
+  top: 20px;
 }
+/* Add Card */
+.add-card {
+  background-color: #222831;
+}
+/****************************************/
+/* Graph */
+/****************************************/
 .graph-container {
   max-height: 40%;
   max-width: 90%;
@@ -64,18 +65,19 @@ main {
   border-radius: 5px;
 }
 
+/****************************************/
+/* Misc */
+/****************************************/
+#team-container {
+  height: 40%;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
 input[type="text"] {
   padding: 13px 16px;
   border-radius: 5px;
   border: none;
 }
-.delete-button {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-}
-/*  #222831 
-    #31363F
-    #76ABAE
-    #EEEEEE
-*/

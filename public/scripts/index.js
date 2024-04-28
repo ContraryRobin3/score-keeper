@@ -1,3 +1,37 @@
+////////////////////////////////////////////////////////////////
+/// Constants
+////////////////////////////////////////////////////////////////
+/// Team Card Colors
+const teamColors = ["#5661D6", "#D65657", "#D7BB57", "#56D679"];
+
+/// SVG Paths for buttons
+const subtractSVGPath =
+  "M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm2.5 7.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1";
+const addSVGPath =
+  "M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0";
+const deleteSVGPath =
+  "M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0";
+
+////////////////////////////////////////////////////////////////
+/// main
+////////////////////////////////////////////////////////////////
+if (storageAvailable("localStorage")) {
+  if (!localStorage.getItem("teams")) {
+    let teams = [];
+    saveToStorage("teams", teams);
+  }
+} else {
+  // Too bad, no localStorage for us
+  // TODO render a page that states that the browser is not supported
+}
+refreshTeamCards();
+var myChart = createChart();
+
+////////////////////////////////////////////////////////////////
+/// Functions
+////////////////////////////////////////////////////////////////
+
+/// Tests to ensure that Local Storage is Supported
 function storageAvailable(type) {
   let storage;
   try {
@@ -24,24 +58,10 @@ function storageAvailable(type) {
     );
   }
 }
-if (storageAvailable("localStorage")) {
-  if (!localStorage.getItem("teams")) {
-    let teams = [];
-    saveToStorage("teams", teams);
-  }
-} else {
-  // Too bad, no localStorage for us
-}
-//localStorage.removeItem("teams");
 
-const teamColors = ["#5661D6", "#D65657", "#D7BB57", "#56D679"];
-
-document.querySelector("#add-team-button");
-refreshTeamCards();
-
+/// TEAM Manipulation Functions
 function addTeam(teamName) {
   const currentCount = getTeamCount();
-  console.log("currentCount" + currentCount);
   const newTeam = {
     id: currentCount,
     name: teamName,
@@ -53,7 +73,9 @@ function addTeam(teamName) {
   saveToStorage("teams", currentTeams);
   refreshTeamCards();
 }
+
 function deleteTeam(index) {
+  // Confirm that the user wants to delete the team
   if (confirm("Are you sure you want to delete this team?") == true) {
     let currentTeams = getFromStorage("teams");
     currentTeams.splice(index, 1);
@@ -62,18 +84,20 @@ function deleteTeam(index) {
   }
 }
 
+/// Clears out the team-container and regenerates the team cards
 function refreshTeamCards() {
   // Clear out container
   const container = document.getElementById("team-container");
   while (container.firstChild) {
     container.removeChild(container.lastChild);
   }
+
+  // Create a team card for each team
   const teams = getFromStorage("teams");
-  console.log(teams);
   let index = 0;
   teams.forEach((team) => {
     const teamCard = document.createElement("div");
-    teamCard.classList.add("team-card");
+    teamCard.classList.add("team-card", "card");
     teamCard.style.backgroundColor = teamColors[index];
 
     const teamName = document.createElement("h2");
@@ -89,15 +113,15 @@ function refreshTeamCards() {
     const scoreButtons = document.createElement("div");
     scoreButtons.classList.add("score-buttons");
 
-    const subtractButton = createSubtractButton(50);
+    const subtractButton = createButton(subtractSVGPath, 50);
     subtractButton.onclick = subtractPoint.bind(subtractButton, index);
     scoreButtons.appendChild(subtractButton);
-    const addButton = createAddButton(50);
+    const addButton = createButton(addSVGPath, 50);
     addButton.onclick = addPoint.bind(addButton, index);
     scoreButtons.appendChild(addButton);
     teamCard.appendChild(scoreButtons);
 
-    const deleteButton = createDeleteButton(20);
+    const deleteButton = createButton(deleteSVGPath, 20);
     deleteButton.classList.add("delete-button");
     deleteButton.onclick = deleteTeam.bind(deleteButton, index);
     teamCard.appendChild(deleteButton);
@@ -105,9 +129,11 @@ function refreshTeamCards() {
     container.appendChild(teamCard);
     index++;
   });
+
+  // If there is under 4 teams create the add team UI
   if (getTeamCount() < 4) {
     const addCard = document.createElement("div");
-    addCard.classList.add("add-card");
+    addCard.classList.add("add-card", "card");
 
     const input = document.createElement("input");
     input.type = "text";
@@ -119,7 +145,7 @@ function refreshTeamCards() {
     const scoreButtons = document.createElement("div");
     scoreButtons.classList.add("score-buttons");
 
-    const addButton = createAddButton(82);
+    const addButton = createButton(addSVGPath, 82);
     addButton.onclick = () => {
       const newName = document.querySelector("#new-team-name-input").value;
       addTeam(newName);
@@ -136,12 +162,7 @@ function refreshTeamCards() {
   myChart = createChart();
 }
 
-const xValues = ["Italy", "France", "Spain", "USA", "Argentina"];
-const yValues = [55, 49, 44, 24, 15];
-const barColors = ["red", "green", "blue", "orange", "brown"];
-
-var myChart = createChart();
-
+/// Creates a new chart based on the teams scores
 function createChart() {
   return new Chart("myChart", {
     type: "bar",
@@ -168,6 +189,7 @@ function createChart() {
   });
 }
 
+/// Adds a point to a team based on the team index
 function addPoint(index) {
   let teams = getFromStorage("teams");
   teams[index].score++;
@@ -175,6 +197,7 @@ function addPoint(index) {
   refreshTeamCards();
 }
 
+/// Subtracts a point to a team based on the team index
 function subtractPoint(index) {
   let teams = getFromStorage("teams");
   teams[index].score--;
@@ -182,6 +205,7 @@ function subtractPoint(index) {
   refreshTeamCards();
 }
 
+/// Returns an arrary of the teams scores
 function getScores() {
   let scores = [];
   const teams = getFromStorage("teams");
@@ -190,6 +214,8 @@ function getScores() {
   });
   return scores;
 }
+
+/// Returns an arrary of the teams names
 function getTeamNames() {
   let names = [];
   const teams = getFromStorage("teams");
@@ -203,46 +229,24 @@ function getTeamCount() {
   return getFromStorage("teams").length;
 }
 
+/// Saves a json object to Local Storage
 function saveToStorage(name, jsonObject) {
   localStorage.setItem(name, JSON.stringify(jsonObject));
 }
 
+/// Returns a JSON object from Local Storage
 function getFromStorage(name) {
   return JSON.parse(localStorage.getItem(name));
 }
 
-function createSubtractButton(size) {
+/// Creates a button from given svgPath at specified size
+function createButton(svgPath, size) {
   var xmlns = "http://www.w3.org/2000/svg";
-  const subtractButton = document.createElementNS(xmlns, "svg");
-  subtractButton.setAttributeNS(null, "viewBox", "0 0 " + 16 + " " + 16);
-  subtractButton.setAttributeNS(null, "width", size);
-  subtractButton.setAttributeNS(null, "height", size);
-  subtractButton.setAttributeNS(null, "fill", "currentColor");
-  subtractButton.innerHTML =
-    "<path d='M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm2.5 7.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1'/>";
-  return subtractButton;
-}
-
-function createAddButton(size) {
-  var xmlns = "http://www.w3.org/2000/svg";
-  const addButton = document.createElementNS(xmlns, "svg");
-  addButton.setAttributeNS(null, "viewBox", "0 0 " + 16 + " " + 16);
-  addButton.setAttributeNS(null, "width", size);
-  addButton.setAttributeNS(null, "height", size);
-  addButton.setAttributeNS(null, "fill", "currentColor");
-  addButton.innerHTML =
-    "<path d='M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0'/>";
-  return addButton;
-}
-
-function createDeleteButton(size) {
-  var xmlns = "http://www.w3.org/2000/svg";
-  const addButton = document.createElementNS(xmlns, "svg");
-  addButton.setAttributeNS(null, "viewBox", "0 0 " + 16 + " " + 16);
-  addButton.setAttributeNS(null, "width", size);
-  addButton.setAttributeNS(null, "height", size);
-  addButton.setAttributeNS(null, "fill", "#CCCCCC");
-  addButton.innerHTML =
-    "<path d='M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0'/>";
-  return addButton;
+  const button = document.createElementNS(xmlns, "svg");
+  button.setAttributeNS(null, "viewBox", "0 0 " + 16 + " " + 16);
+  button.setAttributeNS(null, "width", size);
+  button.setAttributeNS(null, "height", size);
+  button.setAttributeNS(null, "fill", "currentColor");
+  button.innerHTML = `<path d='${svgPath}'/>`;
+  return button;
 }
